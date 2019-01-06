@@ -56,12 +56,13 @@ differentialAnalysis <- function(obj,norm_counts_avg, windows,conditions, region
       plot_df=plot_df[which(plot_df[,1] >= coordinates[1] & plot_df[,1] <= coordinates[2]),]
     }
     
-    quartz()
-    print(ggplot(plot_df, aes(x=coord, y=counts, colour=conditions))+geom_line()+
+    pdf("linePlot.pdf")
+    ggplot(plot_df, aes(x=coord, y=counts, colour=conditions))+geom_line()+
       theme_bw()+
       xlab(paste("Chromosome coordinates (", obj@bait_chr, ")", sep =""))+
       ylab("Normalized counts")+geom_point(data=subset(plot_df,sig=="not_sig"), shape=1, size=0.5)+
-      geom_point(data=subset(plot_df,sig=="sig")))
+      geom_point(data=subset(plot_df,sig=="sig"))
+    dev.off()
   }
   if(region == "cis"){
     plot_df = data.frame(coord=c(rowMeans(windows[,2:3]),rowMeans(windows[,2:3])),
@@ -69,12 +70,13 @@ differentialAnalysis <- function(obj,norm_counts_avg, windows,conditions, region
                                   rowMeans(norm_counts_log[,cols_conditions[condition2_row,1]:cols_conditions[condition2_row,2]])),
                          conditions=c(rep(conditions[1], nrow(windows)), rep(conditions[2], nrow(windows))),
                          sig=c(sig_rows, sig_rows))
-    quartz()
-    print(ggplot(plot_df, aes(x=coord, y=counts, colour=conditions))+
+    pdf("signalPlot.pdf")
+    ggplot(plot_df, aes(x=coord, y=counts, colour=conditions))+
       theme_bw()+
       xlab(paste("Chromosome coordinates (", obj@bait_chr, ")", sep =""))+
       ylab("Normalized counts")+geom_point(data=subset(plot_df,sig=="not_sig"), shape=1, size=0.5)+
-      geom_point(data=subset(plot_df,sig=="sig")))
+      geom_point(data=subset(plot_df,sig=="sig"))
+    dev.off()
   }
   sig_merge_windows=merge_windows(windows[which(res$padj < pval), 1:3])
   print(paste("BED file of significant domains saved in ", obj@output_dir, sep = ""))
