@@ -35,6 +35,9 @@ differentialAnalysis <- function(obj,norm_counts_avg, windows,conditions, region
     }
   }
   norm_counts = counts(dds, normalized = TRUE)
+  write.table(norm_counts,
+    paste(obj@output_dir, obj@bait_name, "_", conditions[1], "_", conditions[2], "_norm_counts.txt", sep = ""),
+    quote=FALSE, col.names=TRUE, row.names=FALSE, sep = "\t")
   norm_counts_log = log(norm_counts+1,10)
   condition1_row = which(obj@conditions == conditions[1])
   condition2_row = which(obj@conditions == conditions[2])
@@ -56,7 +59,11 @@ differentialAnalysis <- function(obj,norm_counts_avg, windows,conditions, region
       plot_df=plot_df[which(plot_df[,1] >= coordinates[1] & plot_df[,1] <= coordinates[2]),]
     }
     
-    pdf("linePlot.pdf")
+    write.table(plot_df,
+    paste(obj@output_dir, obj@bait_name, "_", conditions[1], "_", conditions[2], "_plot_df.txt", sep = ""),
+    quote=FALSE, col.names=TRUE, row.names=FALSE, sep = "\t")
+    
+    pdf(paste(obj@output_dir, obj@bait_name, "_", conditions[1], "_", conditions[2], "_linePlot_nearBait.pdf", sep = ""))
     ggplot(plot_df, aes(x=coord, y=counts, colour=conditions))+geom_line()+
       theme_bw()+
       xlab(paste("Chromosome coordinates (", obj@bait_chr, ")", sep =""))+
@@ -70,7 +77,7 @@ differentialAnalysis <- function(obj,norm_counts_avg, windows,conditions, region
                                   rowMeans(norm_counts_log[,cols_conditions[condition2_row,1]:cols_conditions[condition2_row,2]])),
                          conditions=c(rep(conditions[1], nrow(windows)), rep(conditions[2], nrow(windows))),
                          sig=c(sig_rows, sig_rows))
-    pdf("signalPlot.pdf")
+    pdf(paste(obj@output_dir, obj@bait_name, "_", conditions[1], "_", conditions[2], "_linePlot_cis.pdf", sep = ""))
     ggplot(plot_df, aes(x=coord, y=counts, colour=conditions))+
       theme_bw()+
       xlab(paste("Chromosome coordinates (", obj@bait_chr, ")", sep =""))+
